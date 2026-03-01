@@ -3,7 +3,7 @@ import pygame
 class Text():
 
     def __init__(self, surface, text, size, color, x, y):
-        font_name = pygame.font.match_font('arial')
+        font_name = pygame.font.match_font('stencil')
         self.surface = surface
         self.text = text
         self.size = size
