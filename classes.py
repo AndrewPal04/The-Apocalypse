@@ -31,25 +31,24 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         keystate = pygame.key.get_pressed()
         if keystate[pygame.K_w]:
-            self.rect.y -= 10
+            self.rect.y -= 5
         if keystate[pygame.K_s]:
-            self.rect.y += 10
+            self.rect.y += 5
         if keystate[pygame.K_d]:
-            self.rect.x += 10
+            self.rect.x += 5
         if keystate[pygame.K_a]:
-            self.rect.x -= 10
+            self.rect.x -= 5
 
-        if self.rect.bottom < 0:
-            self.rect.top = 500
-        if self.rect.top > 500:
-            self.rect.bottom = 0
-        if self.rect.left > 1000:
-            self.rect.right = 0
-        if self.rect.right < 0:
-            self.rect.left = 1000
+        if self.rect.top < 0:
+            self.rect.top = 0
+        if self.rect.bottom > 600:
+            self.rect.bottom = 600
+        if self.rect.right > 1000:
+            self.rect.right = 1000
+        if self.rect.left < 0:
+            self.rect.left = 0
 
 class Button(pygame.sprite.Sprite):
-
     def __init__(self, surface, image, scale, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.surface = surface
