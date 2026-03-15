@@ -48,6 +48,26 @@ class Player(pygame.sprite.Sprite):
         if self.rect.left < 0:
             self.rect.left = 0
 
+
+class Zombie(pygame.sprite.Sprite):
+
+    def __init__(self, surface, image, scale, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        width = image.get_width()
+        height = image.get_height()
+        self.alive = True
+        self.surface = surface
+        self.image = pygame.transform.scale(image, (int(width * scale), int(height * scale)))
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+
+    def update(self,target):
+        if self.rect.x > target.rect.x:
+            self.rect.x -= 1
+    def draw(self):
+        self.surface.blit(self.image, (self.rect.x, self.rect.y))
+        
+
 class Button(pygame.sprite.Sprite):
     def __init__(self, surface, image, scale, x, y):
         pygame.sprite.Sprite.__init__(self)
