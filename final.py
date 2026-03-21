@@ -12,6 +12,20 @@ pygame.init()
 screen = pygame.display.set_mode((1000, 600))
 clock = pygame.time.Clock()
 
+def lose():
+    endpageIMG = pygame.image.load("gameover.png")
+    endpage = Background(screen,endpageIMG,1,500,300)
+    
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+        screen.fill((0,0,0))
+        endpage.draw()
+
+        pygame.display.update()
+        clock.tick(60)
 
 def policeGun():
     pygame.mixer.init()
@@ -21,12 +35,34 @@ def policeGun():
     sprite_group = pygame.sprite.Group()
     playerIMG = pygame.image.load("characterG.png")
     zombieIMG1 = pygame.image.load("zombie1.png")
+    zombieIMG2 = pygame.image.load("zombie2.png")
+    zombieIMG3 = pygame.image.load("zombie3.png")
+    zombieIMG4 = pygame.image.load("zombieboss4.png")
+    wallIMG = pygame.image.load("wall.png")
+    wall1 = Background(screen,wallIMG,0.1,305,20)
+    wall2 = Background(screen,wallIMG,0.1,305,120)
+    wall3 = Background(screen,wallIMG,0.1,305,220)
+    wall4 = Background(screen,wallIMG,0.1,305,320)
+    wall5 = Background(screen,wallIMG,0.1,305,420)
+    wall6 = Background(screen,wallIMG,0.1,305,540)
+    walls = [wall1,wall2,wall3,wall4, wall5, wall6]
     player = Player(playerIMG,0.08,100,300)
+    wallHealth = 500
+    wallText = Text(screen, "Wall Health: "+str(wallHealth) , 40, (0,0,0), 550, 50)
     zombies = [
-        Zombie(screen,zombieIMG1,0.165,1100,random.randint(50,550)),
-        Zombie(screen,zombieIMG1,0.165,1200,random.randint(50,550)),
-        Zombie(screen,zombieIMG1,0.165,1050,random.randint(50,550)),
-        Zombie(screen,zombieIMG1,0.165,1150,random.randint(50,550))
+        Zombie(screen,zombieIMG1,0.165,1100,random.randint(100,500)),
+        Zombie(screen,zombieIMG1,0.165,1100,random.randint(100,500)),
+        Zombie(screen,zombieIMG1,0.165,1100,random.randint(100,500)),
+        Zombie(screen,zombieIMG1,0.165,1200,random.randint(100,500)),
+        Zombie(screen,zombieIMG1,0.165,1050,random.randint(100,500)),
+        Zombie(screen,zombieIMG2,0.3,1150,random.randint(100,500)),
+        Zombie(screen,zombieIMG2,0.3,1150,random.randint(100,500)),
+        Zombie(screen,zombieIMG2,0.3,1120,random.randint(100,500)),
+        Zombie(screen,zombieIMG3,0.35,1090,random.randint(100,500)),
+        Zombie(screen,zombieIMG3,0.35,1110,random.randint(100,500)),               
+        Zombie(screen,zombieIMG3,0.35,1110,random.randint(100,500)),
+        Zombie(screen,zombieIMG4,0.5,1250,random.randint(100,500)),
+        Zombie(screen,zombieIMG4,0.5,1250,random.randint(100,500))
     ]
     sprite_group.add(player)
     texts =[
@@ -43,6 +79,9 @@ def policeGun():
         #workspace
         desert.draw()
         sprite_group.draw(screen)
+        for wall in walls:
+            wall.draw()
+        wallText.draw()
         #draw texts with if statements, and draw player on screen, and player.update() after
         if end-start < 3:
             texts[0].draw()
@@ -52,8 +91,13 @@ def policeGun():
             player.update()
             for i in range(len(zombies)):
                 if zombies[i].alive:
-                    zombies[i].update(player)
+                    if zombies[i].rect.x < 305:
+                        wallHealth -= 0.5
+                        wallText = Text(screen, "Wall Health: "+str(wallHealth) , 40, (0,0,0), 550, 50)
+                    else:
+                        zombies[i].update(player)
                     zombies[i].draw()
+                    
         keystate = pygame.key.get_pressed()
 
         #shoot
@@ -62,23 +106,24 @@ def policeGun():
             for i in range(len(zombies)):
                 if abs(player.rect.y - zombies[i].rect.y) < 20:
                     zombies[i].alive = False
-        
+
         numZombies = 0
         for i in range(len(zombies)):
             if zombies[i].alive:
                 numZombies +=1
         if numZombies == 0:
             for i in range(len(zombies)):
-                zombies[i].alive = True
+                zombies[i].alive = True 
                 zombies[i].rect.x = random.randint(1050, 1300)
-                zombies[i].rect.y = random.randint(50, 550)
+                zombies[i].rect.y = random.randint(100, 500)
 
+        if wallHealth<1:
+            lose()
 
-        
         if player.rect.right >=300:
             player.rect.right = 300
-        
-        
+
+
         pygame.display.update()
         clock.tick(60)
 
@@ -94,7 +139,7 @@ def main():
     # Gun
     gun_png = pygame.image.load("gun.png")
     gun = Background(screen,gun_png,0.14,800,150)
-    
+
 
     texts =[
         Text(screen, "Hmm.. What is this place?", 40, (0,0,0), 500, 500),
@@ -118,7 +163,7 @@ def main():
             texts[2].draw()
         else:
             player.update()
-            
+
         gun.draw()
         if pygame.sprite.collide_rect(player, gun):
             screen.fill((0,0,0))
@@ -126,7 +171,7 @@ def main():
             time.sleep(2)
             policeGun()
         sprite_group.draw(screen)
-        
+
 
         pygame.display.update()
         clock.tick(60)
@@ -139,7 +184,9 @@ def start():
     # Button
     playIMG = pygame.image.load("playbtn.png")
     play=Button(screen,playIMG,1, 500, 300)
-
+    pygame.mixer.init()
+    pygame.mixer.music.load("intro.mp3")
+    pygame.mixer.music.play(-1)
     # game loop
     while True:
         for event in pygame.event.get():
@@ -150,6 +197,7 @@ def start():
         start.draw()
         title.draw()
         if play.draw():
+            pygame.mixer.music.stop()
             main()
 
         pygame.display.update()
@@ -159,11 +207,10 @@ start()
 
 """
 Homework
-For homework I want you to Change the images for some of the zombies, so there
-are more types. Also, find an image for the barrier you wanted to add into the game
-where the zombies will stop. Currently, the zombies can also spawn in
-50 - 550, but the user can't hit them if they spawn too low or too high. Make it so they
-can't spawn outside of where the user can hit them.
+Using the link: https://docs.google.com/presentation/d/1SvjGVSDHrpJ3E__emNbEpPLVFicQvc0u9rTCRFXXVmg/edit
+I want you to create your full presentation, and make sure to decorate your slides with some of
+the many pictures you have from sprites and backgrounds. Make sure to write enough
+information on each slide, and include screenshots of your program in certain slides
 Good Luck!
 """
 
@@ -174,3 +221,4 @@ go to https://github.com/AndrewPal04/The-Apocalypse
 hit code, and then hit download so you can create a copy
 of the entire code, and all the pictures
 """
+
